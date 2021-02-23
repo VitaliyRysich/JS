@@ -1,15 +1,14 @@
-const fetch = require("node-fetch");
-const getRandomUsers = n => {
-    const fetchRandomUsers = fetch(`https://randomuser.me/api/?results=${n}`);
-    fetchRandomUsers.then(data => {
-        data.json().then( randomUsers => {
-            // console.log(JSON.stringify(randomUsers));
-            randomUsers.results.forEach(user => {
-                const {gender, email} = user;
-                console.log(`${gender} - ${email}`);
-            });
-        })
-    });
-}
+import { coroutine as co } from 'bluebird';
 
-getRandomUsers(10);
+const getRandomUsers = co(function* (n) {
+  const fetchRandomUsers = yield fetch(`https://randomuser.me/api/?results=${n}`)
+  const data = yield fetchRandomUsers.json();
+  return data;
+});
+
+getRandomUsers(10).then(randomUsers => {
+  randomUsers.results.forEach(user => {
+    const {gender, email} = user;
+    console.log(`${gender} - ${email}`);
+  });
+}).catch(err => log);
